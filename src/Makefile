@@ -5,31 +5,43 @@
 # $Log:$
 #
 
-HOSTGCC?=gcc
+HOSTGCC=gcc
 
-CC?=gcc  # gcc or g++
-CC_HOST?=gcc
+CC = arm-none-eabi-gcc  # gcc or g++
+GCC = arm-none-eabi-gcc
+PYTHON = python3
+OBJCOPY = objcopy
+CC_HOST = gcc
+
+SDK = mre-makefile/sdk
+APP_FILE_NAME = DooMRE
+
 # 
 
 # for E1M1 Only, 
 #  make clean && cp support/stripchoice-E1M1ONLY.txt support/stripchoice.txt && cp support/stripchoice-E1M1ONLY.txt support/stripchoicebegin.txt && EXTRA_CFLAGS="-DE1M1ONLY=1" make && ls -l emdoom
 # 
 
-CFLAGS?=-m32 -Os -g -w -flto -DNORMALUNIX -DLINUX -DMAXPLAYERS=1 -DRANGECHECK -DDISABLE_NETWORK -fdata-sections -ffunction-sections $(EXTRA_CFLAGS) # -DUSEASM 
-LDFLAGS?=-L/usr/X11R6/lib -Wl,--gc-sections $(CFLAGS)
-LIBS?=-lXext -lX11 -lnsl -lm -lpthread
-CFLAGS_HOST?=-m32 -DNORMALUNIX -DLINUX $(EXTRA_CFLAGS)
+INCLUDES = -I "$(SDK)/include" -I "$(SDK)/../src/include" -I "$(SDK)/../src/ResID" -I "$(SDK)/../src"
+DEFINES = -D _MINIGUI_LIB_ -D _USE_MINIGUIENTRY -D _NOUNIX_ -D _FOR_WNC -D __MRE_SDK__ -D __MRE_VENUS_NORMAL__ -D __MMI_MAINLCD_240X320__ -D MRE -D GCC -D __MRE_COMPILER_GCC__
+
+SHARED_PARAM = -fpic -march=armv5te -fvisibility=hidden -mlittle-endian $(INCLUDES) $(DEFINES) -fdata-sections -ffunction-sections
+EXTRA_CFLAGS = $(SHARED_PARAM)
+
+CFLAGS?= -O2 -DNORMALUNIX -DLINUX -DMAXPLAYERS=1 -DRANGECHECK -DDISABLE_NETWORK -fdata-sections -ffunction-sections -DDISABLE_NETWORK $(EXTRA_CFLAGS) # -DUSEASM 
+LDFLAGS?= -Wl,-egcc_entry -Wl,--gc-sections -fpic -fpcc-struct-return -pie -lm -T "$(SDK)/scat.ld"
+LIBS?= $(SDK)/lib/*.a
+
+CFLAGS_HOST?=-m32 -DNORMALUNIX -DLINUX
 LDFLAGS_HOST?=-L/usr/X11R6/lib
 LIBS_HOST?=-lXext -lX11 -lnsl -lm -lpthread
 CS?=i_video.c
 
-
-# If you want to reduce printf junk
+# If you want to reduce printf_ junk
 CFLAGS+=-DSET_MEMORY_DEBUG=0
 
-
-#CFLAGS_FINAL:=$(CFLAGS)
-#CFLAGS_FINAL+=-DFIXED_HEAP=262144
+CFLAGS_FINAL:=$(CFLAGS)
+CFLAGS_FINAL+=-DFIXED_HEAP=524288
 #CS:=i_video.c
 
 # if you need to do low-level memory debugging.  This will help find things like out-of-array writing.
@@ -50,73 +62,75 @@ BAKED:=support/baked_texture_data.o support/baked_map_data.o
 O=linux
 
 # not too sophisticated dependency
-CS+=				\
-		doomdef.c \
-		doomstat.c \
-		dstrings.c \
-		i_system.c		\
-		tables.c			\
-		f_finale.c		\
-		f_wipe.c 		\
-		d_main.c			\
-		d_items.c		\
-		g_game.c			\
-		m_menu.c			\
-		m_misc.c			\
-		m_argv.c  		\
-		m_bbox.c			\
-		m_fixed.c		\
-		m_swap.c			\
-		m_cheat.c		\
-		m_random.c		\
-		am_map.c			\
-		p_ceilng.c		\
-		p_doors.c		\
-		p_enemy.c		\
-		p_floor.c		\
-		p_inter.c		\
-		p_lights.c		\
-		p_map.c			\
-		p_maputl.c		\
-		p_plats.c		\
-		p_pspr.c			\
-		p_setup.c		\
-		p_sight.c		\
-		p_spec.c			\
-		p_switch.c		\
-		p_mobj.c			\
-		p_telept.c		\
-		p_tick.c			\
-		p_saveg.c		\
-		p_user.c			\
-		r_bsp.c			\
-		r_data.c			\
-		r_draw.c			\
-		r_main.c			\
-		r_plane.c		\
-		r_segs.c			\
-		r_sky.c			\
-		r_things.c		\
-		w_wad.c			\
-		wi_stuff.c		\
-		v_video.c		\
-		st_lib.c			\
-		st_stuff.c		\
-		hu_stuff.c		\
-		hu_lib.c			\
-		z_zone.c			\
-		info.c				\
-		i_net.c			\
-		d_net.c			\
-		stubs.c    \
-		sounds.c	\
-		s_sound.c		\
-		i_sound.c
+CS+=                            \
+		doomdef.c               \
+		doomstat.c              \
+		dstrings.c              \
+		i_system.c              \
+		tables.c                \
+		f_finale.c              \
+		f_wipe.c 		        \
+		d_main.c		        \
+		d_items.c		        \
+		g_game.c		        \
+		m_menu.c		        \
+		m_misc.c		        \
+		m_argv.c  		        \
+		m_bbox.c		        \
+		m_fixed.c		        \
+		m_swap.c		        \
+		m_cheat.c		        \
+		m_random.c		        \
+		am_map.c		        \
+		p_ceilng.c		        \
+		p_doors.c		        \
+		p_enemy.c		        \
+		p_floor.c		        \
+		p_inter.c		        \
+		p_lights.c		        \
+		p_map.c			        \
+		p_maputl.c		        \
+		p_plats.c		        \
+		p_pspr.c		        \
+		p_setup.c		        \
+		p_sight.c		        \
+		p_spec.c		        \
+		p_switch.c		        \
+		p_mobj.c		        \
+		p_telept.c		        \
+		p_tick.c		        \
+		p_saveg.c		        \
+		p_user.c		        \
+		r_bsp.c			        \
+		r_data.c		        \
+		r_draw.c		        \
+		r_main.c		        \
+		r_plane.c		        \
+		r_segs.c		        \
+		r_sky.c			        \
+		r_things.c		        \
+		w_wad.c			        \
+		wi_stuff.c		        \
+		v_video.c		        \
+		st_lib.c		        \
+		st_stuff.c		        \
+		hu_stuff.c		        \
+		hu_lib.c		        \
+		z_zone.c		        \
+		info.c			        \
+		i_net.c			        \
+		d_net.c			        \
+		stubs.c                 \
+		sounds.c	            \
+		s_sound.c		        \
+		i_sound.c               \
+		$(SDK)/../src/gccmain.c \
+		$(SDK)/../src/c_fix.c   \
 
-all:	 emdoom
+all: $(APP_FILE_NAME).vxp
 
-emdoom:	$(CS) i_main.c $(BAKED) $(SUPPORT_FILES) support/rawwad_use.o
-	$(CC) $(CFLAGS_FINAL)  $^ -o emdoom $(LDFLAGS) $(LIBS)
+$(APP_FILE_NAME).axf: $(CS) i_main.c $(BAKED) $(SUPPORT_FILES) support/rawwad_use.o
+	$(CC) $(CFLAGS_FINAL) $^ -o $@ $(LIBS) $(LDFLAGS)
 
 support/baked_texture_data.c support/baked_map_data.c bakedoutput.txt : emdoom.gentables.initial
 	./emdoom.gentables.initial $(STRIKEMAP) > support/bakedoutput.txt
@@ -166,27 +180,36 @@ emdoom.size : emdoom
 #emdoom.gentables : i_main.c $(CS) support/rawwad_host_begin.o $(BAKED)
 #	$(CC_HOST) $(CFLAGS_HOST) $(LDFLAGS_HOST) $^ -o emdoom.gentables -g -DGENERATE_BAKED $(LIBS_HOST)
 
-emdoom.gentables.initial : i_main.c $(CS) support/rawwad_host_begin.o
-	$(CC_HOST) $(CFLAGS_HOST) $(LDFLAGS_HOST) $^ -o emdoom.gentables.initial -g -DGENERATE_BAKED -DGENERATE_BAKED_INITIAL $(LIBS_HOST)
+#emdoom.gentables.initial : i_main.c $(CS) support/rawwad_host_begin.o
+#	$(CC_HOST) $(CFLAGS_HOST) $(LDFLAGS_HOST) $^ -o emdoom.gentables.initial -g -DGENERATE_BAKED -DGENERATE_BAKED_INITIAL $(LIBS_HOST)
 
+#$(APP_FILE_NAME).axf: $(patsubst $(SDK)/../src/%.c,%.o,$(wildcard $(SDK)/../src/*.c))
+#	$(GCC) -o $@ $^ $(LINK_LIB) $(LINK_PARAM)
+
+$(APP_FILE_NAME).vxp: $(APP_FILE_NAME).axf
+	$(OBJCOPY) -I elf32-little --add-section .vm_res=$(SDK)/resource.bin $^ $@
+	SDK=$(SDK) $(PYTHON) $(SDK)/build.py $(APP_FILE_NAME).vxp $(APP_FILE_NAME).vxp
+
+#$(APP_FILE_NAME).vxp: $(APP_FILE_NAME).vxp
+#	SDK=$(SDK) $(PYTHON) $(SDK)/build.py $^ $@
 
 clean:
-	rm -f *.o *~ *.flc
-	rm -f emdoom emdoom.gentables emdoom.gentables.initial $(BAKED) support/wadder support/rawwad_host.o support/rawwad_host_use.o support/rawwad_host_begin.o support/shrinkwad
+	rm -f *.o *~ *.flc *.axf *.vxp
+	rm -f emdoom emdoom.gentables $(BAKED) support/wadder support/rawwad_host.o support/rawwad_host_use.o support/rawwad_host_begin.o support/shrinkwad
 	rm -rf support/baked_map_data.c  support/baked_texture_data.c
-	rm -rf support/rawwad_begin.c support/rawwad_begin.o support/rawwad_use.c support/rawwad_use.o support/bakedoutput.txt
+	rm -rf support/rawwad_begin.o support/rawwad_use.o support/bakedoutput.txt
 
 ### Extra features
 
-support/shrinkwad : support/shrinkwad.c
-	$(CC_HOST) $(CFLAGS_HOST) $(LDFLAGS_HOST) -o $@ $^ $(LIBS_HOST) 
+#support/shrinkwad : support/shrinkwad.c
+#	$(CC_HOST) $(CFLAGS_HOST) $(LDFLAGS_HOST) -o $@ $^ $(LIBS_HOST) 
 
-support/rawwad_use.c : support/shrinkwad support/stripchoice.txt support/add_sprites.txt
-	cd support && ./shrinkwad stripchoice.txt add_sprites.txt rawwad_use.c rawwad_use.h
+#support/rawwad_use.c : support/shrinkwad support/stripchoice.txt support/add_sprites.txt
+#	cd support && ./shrinkwad stripchoice.txt add_sprites.txt rawwad_use.c rawwad_use.h
 
-support/rawwad_begin.c : support/shrinkwad support/stripchoicebegin.txt
-	#cat gentableslog.txt | grep -a ACCESS_LUMP > lumpaccess.txt
-	cd support && ./shrinkwad stripchoicebegin.txt 0 rawwad_begin.c rawwad_begin.h
+#support/rawwad_begin.c : support/shrinkwad support/stripchoicebegin.txt
+#	#cat gentableslog.txt | grep -a ACCESS_LUMP > lumpaccess.txt
+#	cd support && ./shrinkwad stripchoicebegin.txt 0 rawwad_begin.c rawwad_begin.h
 
 #############################################################
 #

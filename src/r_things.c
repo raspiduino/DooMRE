@@ -110,7 +110,7 @@ R_InstallSpriteLump
   boolean		flipped )
 {
 	int				r;
-//printf( "LOADING LUMP %d / %d\n", lump, rotation );
+//printf_( "LOADING LUMP %d / %d\n", lump, rotation );
 	if (frame >= 29 || rotation > 8)
 		I_Error("R_InstallSpriteLump: "
 				"Bad frame characters in lump %i", lump);
@@ -233,8 +233,8 @@ void R_InitSpriteDefs (char** namelist)
 
 		
 #ifdef GENERATE_BAKED
-				printf( "\nACCESS_LUMP 5 %d\n", l );
-				printf( "\nACCESS_LUMP 5 %d\n", patched );
+				printf_( "\nACCESS_LUMP 5 %d\n", l );
+				printf_( "\nACCESS_LUMP 5 %d\n", patched );
 #endif
 
 				R_InstallSpriteLump (patched, frame, rotation, false);

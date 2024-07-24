@@ -131,7 +131,7 @@ int main( int argc, char ** argv )
 			}
 			if( dummy1 != 1 )
 			{
-				printf( "%s marked for use\n", sprnames[spriteno] );
+				printf_( "%s marked for use\n", sprnames[spriteno] );
 				usespritemap[spriteno] = 1;
 			}
 		}
@@ -148,10 +148,10 @@ int main( int argc, char ** argv )
 	int j;
 	for( j = 0; j < NUMSPRITES; j++ )
 	{
-		printf( "%s: %d\n", sprnames[j], usespritemap[j] );
+		printf_( "%s: %d\n", sprnames[j], usespritemap[j] );
 		if( usespritemap[j] == 0 )
 		{
-			printf( "Stripping %s\n", sprnames[j] );
+			printf_( "Stripping %s\n", sprnames[j] );
 
 			for( i = 0 ; i < numlumps; i++ )
 			{
@@ -160,7 +160,7 @@ int main( int argc, char ** argv )
 					chunkmap[i] = -1;
 					char ct9[9] = { 0 };
 					memcpy( ct9, lumpinfo[i].name, 8 );
-					printf( "  %s\n", ct9 );
+					printf_( "  %s\n", ct9 );
 				}
 			}
 		}
@@ -190,7 +190,7 @@ int main( int argc, char ** argv )
 	{
 		maptexture_t * mtexture;
 		numtex = *texture1data;
-		printf( "Num Textures: %d\n", numtex );
+		printf_( "Num Textures: %d\n", numtex );
 		texdirectory = texture1data+1;
 		int * directory = texdirectory;
 		
@@ -200,12 +200,12 @@ int main( int argc, char ** argv )
 			mtexture = (maptexture_t *) ( (unsigned char *)texture1data + offset);
 			char sname[9] = { 0 };
 			memcpy( sname, mtexture->name, 8 );
-			printf( "%s(%d) ", sname, mtexture->patchcount * sizeof(mappatch_t) );
+			printf_( "%s(%d) ", sname, mtexture->patchcount * sizeof(mappatch_t) );
 		}
 	}
 	
 	FILE * fneverstrip = fopen( argv[1], "r" );
-	printf( "Open %s status: %p\n", argv[1], fneverstrip );
+	printf_( "Open %s status: %p\n", argv[1], fneverstrip );
 	while ((drd = getline(&line, &len, fneverstrip)) != -1)
 	{
 		char header[1024];
@@ -217,7 +217,7 @@ int main( int argc, char ** argv )
 		if( star )
 		{
 			mtocheck = star - (header+1);
-			printf( "Wildcard to %d chars\n", mtocheck );
+			printf_( "Wildcard to %d chars\n", mtocheck );
 		}
 
 		for( i = 0 ; i < numlumps; i++ )
@@ -240,7 +240,7 @@ int main( int argc, char ** argv )
 				{
 					//Apply selection to everything in this map.
 					int k;
-					printf( "Section applying for %s (%d)\n", header+1, chunkmap[chunkno] );
+					printf_( "Section applying for %s (%d)\n", header+1, chunkmap[chunkno] );
 					for( k = 1; k <= 10; k++ )
 					{
 						chunkmap[chunkno+k] = chunkmap[chunkno];
@@ -279,7 +279,7 @@ int main( int argc, char ** argv )
 		}
 	}
 */
-	printf( "Loaded list.\n" );
+	printf_( "Loaded list.\n" );
 
 	int couldsave = 0;
 	int newtotal = 0;
@@ -289,7 +289,7 @@ int main( int argc, char ** argv )
 	{
 		if( chunkmap[i] == 0 )
 		{
-			//printf( "%d %s\n", chunkmap[i], lumpinfo[i].name );
+			//printf_( "%d %s\n", chunkmap[i], lumpinfo[i].name );
 			couldsave += lumpinfo[i].size;
 		}
 		else if( chunkmap[i] == -1 )
@@ -318,7 +318,7 @@ int main( int argc, char ** argv )
 	unsigned char  * newchunkdata = malloc( newtotal );
 	int marker = 0;
 
-	printf( "Stripping: " );
+	printf_( "Stripping: " );
 	for( i = 0; i < numlumps; i++ )
 	{
 		if( chunkmap[i] == -1 )
@@ -332,7 +332,7 @@ int main( int argc, char ** argv )
 		{
 			char stp[9] = { 0 };
 			copy8( stp, lumpinfo[i].name );
-			printf( "%s(%d) ", stp, lumpinfo[i].size );
+			printf_( "%s(%d) ", stp, lumpinfo[i].size );
 		}
 		else if( chunkmap[i] == 1 )
 		{
@@ -345,23 +345,23 @@ int main( int argc, char ** argv )
    		}
 	}
 
-	printf( "\n" );
-	printf( "Including: " );
+	printf_( "\n" );
+	printf_( "Including: " );
 	for( i = 0; i < numlumps; i++ )
 	{
 		if( chunkmap[i] != 0 )
 		{
 			char stp[9] = { 0 };
 			copy8( stp, lumpinfo[i].name );
-			printf( "%s(%d) ", stp, (chunkmap[i]<0)?0:lumpinfo[i].size );
+			printf_( "%s(%d) ", stp, (chunkmap[i]<0)?0:lumpinfo[i].size );
 		}
 	}
 
-	printf( "\n" );
-	printf( "Did save %d\n", couldsave );
-	printf( "New Total: %d\n", newtotal );
+	printf_( "\n" );
+	printf_( "Did save %d\n", couldsave );
+	printf_( "New Total: %d\n", newtotal );
 
-	printf( "Comparing: %d/%d/%d\n", tlump, numnewchunks, numlumps );
+	printf_( "Comparing: %d/%d/%d\n", tlump, numnewchunks, numlumps );
 
 	fprintf( f_c, "#include \"../w_wad.h\"\n"
 "const int               numlumps = %d;\n", numnewchunks );
@@ -379,7 +379,7 @@ int main( int argc, char ** argv )
 		char tsr[9];
 		copy8( tsr, newlumpinfo[i].name );
 		tsr[8] = 0;
-		printf( "LUMP %d = %s %d %d\n", i, tsr, newlumpinfo[i].size?newlumpinfo[i].position:0, newlumpinfo[i].size );
+		printf_( "LUMP %d = %s %d %d\n", i, tsr, newlumpinfo[i].size?newlumpinfo[i].position:0, newlumpinfo[i].size );
 		fprintf( f_c, "\t{ \"%s\", %d, %d },\n", tsr, newlumpinfo[i].size?newlumpinfo[i].position:0, newlumpinfo[i].size );
 	}
 	fprintf( f_c, "};\n" );

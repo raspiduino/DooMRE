@@ -98,7 +98,7 @@ void CNFGSetupFullscreen( const char * WindowName, int screen_no )
 	XSetInputFocus( CNFGDisplay, CNFGWindow,   RevertToParent, CurrentTime );
 	XFlush(CNFGDisplay);
 	FullScreen = 1;
-//printf( "%d %d %d %d\n", xpos, ypos, CNFGWinAtt.width, CNFGWinAtt.height );
+//printf_( "%d %d %d %d\n", xpos, ypos, CNFGWinAtt.width, CNFGWinAtt.height );
 	InternalLinkScreenAndGo( WindowName );
 /*
 	setwinattr.override_redirect = 1;
@@ -137,7 +137,7 @@ void CNFGHandleInput()
 //		XEvent nev;
 //		XPeekEvent(CNFGDisplay, &nev);
 
-		//printf( "EVENT %d\n", report.type );
+		//printf_( "EVENT %d\n", report.type );
 		//XMaskEvent(CNFGDisplay, KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | ExposureMask, &report);
 
 		bKeyDirection = 1;
@@ -168,7 +168,7 @@ void CNFGHandleInput()
 			HandleMotion( report.xmotion.x, report.xmotion.y, ButtonsDown>>1 );
 			break;
 		default:
-			printf( "Event: %d\n", report.type );
+			printf_( "Event: %d\n", report.type );
 		}
 	}
 }
@@ -194,7 +194,7 @@ void CNFGUpdateScreenWithBitmap( unsigned long * data, int w, int h )
 
 	if( lw != w || lh != h )
 	{
-		if( xi ) free( xi );
+		if( xi ) vm_free( xi );
 		xi = XCreateImage(CNFGDisplay, DefaultVisual( CNFGDisplay, DefaultScreen(CNFGDisplay) ), depth*8, ZPixmap, 0, (char*)data, w, h, 32, w*4 );
 		lw = w;
 		lh = h;

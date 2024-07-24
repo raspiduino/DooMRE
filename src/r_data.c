@@ -196,7 +196,7 @@ void R_GenerateComposite (int texnum)
 					  PU_STATIC, 
 					  &texturecomposite[texnum]);		
 
-		printf( "TEXTURE CREATION: %d / %d\n", texnum, texturecompositesize[texnum] );
+		printf_( "TEXTURE CREATION: %d / %d\n", texnum, texturecompositesize[texnum] );
 	collump = texturecolumnlump[texnum];
 	colofs = texturecolumnofs[texnum];
 	
@@ -307,7 +307,7 @@ void R_GenerateLookup (int texnum)
 	{
 		if (!patchcount[x])
 		{
-			printf ("R_GenerateLookup: column without a patch (%s)\n",
+			printf_ ("R_GenerateLookup: column without a patch (%s)\n",
 					texture->name);
 			return;
 		}
@@ -449,13 +449,13 @@ void R_InitTextures (void)
 	temp1 = W_GetNumForName ("S_START");  // P_???????
 	temp2 = W_GetNumForName ("S_END") - 1;
 	temp3 = ((temp2-temp1+63)/64) + ((numtextures+63)/64);
-	printf("[");
+	printf_("[");
 	for (i = 0; i < temp3; i++)
-		printf(" ");
-	printf("		 ]");
+		printf_(" ");
+	printf_("		 ]");
 	for (i = 0; i < temp3; i++)
-		printf("\x8");
-	printf("\x8\x8\x8\x8\x8\x8\x8\x8\x8\x8");		
+		printf_("\x8");
+	printf_("\x8\x8\x8\x8\x8\x8\x8\x8\x8\x8");		
 		
 	for (i=0 ; i<numtextures ; i++, directory++)
 	{
@@ -473,7 +473,7 @@ void R_InitTextures (void)
 			I_Error ("R_InitTextures: bad texture directory");
 		
 		mtexture = (maptexture_t *) ( (byte *)maptex + offset);
-		printf( "Texture: %d / %s\n", i, mtexture->name );
+		printf_( "Texture: %d / %s\n", i, mtexture->name );
 
 		texture = textures[i] =
 			Z_Malloc (sizeof(texture_t)
@@ -573,7 +573,7 @@ void R_InitSpriteLumps (void)
 	int				i;
 	patch_t		*patch;
 
-		printf( "INIT_SPRITE_LUMPS\n");
+		printf_( "INIT_SPRITE_LUMPS\n");
 		
 	firstspritelump = W_GetNumForName ("S_START") + 1;
 	lastspritelump = W_GetNumForName ("S_END") - 1;
@@ -586,7 +586,7 @@ void R_InitSpriteLumps (void)
 	for (i=0 ; i< numspritelumps ; i++)
 	{
 		if (!(i&63))
-			printf (".");
+			printf_ (".");
 
 		patch = W_CacheLumpNum (firstspritelump+i, PU_CACHE);
 		spritewidth[i] = SHORT(patch->width)<<FRACBITS;
@@ -632,13 +632,13 @@ void R_InitColormaps (void)
 void R_InitData (void)
 {
 	R_InitTextures ();
-	printf ("\nInitTextures");
+	printf_ ("InitTextures\n");
 	R_InitFlats ();
-	printf ("\nInitFlats");
+	printf_ ("InitFlats\n");
 	R_InitSpriteLumps ();
-	printf ("\nInitSprites");
+	printf_ ("InitSprites\n");
 	R_InitColormaps ();
-	printf ("\nInitColormaps");
+	printf_ ("InitColormaps\n");
 }
 
 
@@ -673,6 +673,7 @@ int R_FlatNumForName (char* name)
 //
 int		R_CheckTextureNumForName (char *name)
 {
+	//printf_("R_CheckTextureNumForName(%s)\n", name);
 	int				i;
 
 	// "NoTexture" marker.
@@ -755,7 +756,7 @@ void R_PrecacheLevel (void)
 			lump = firstflat + i;
 
 #ifdef GENERATE_BAKED
-				printf( "\nACCESS_LUMP 7 %d\n", lump );
+				printf_( "\nACCESS_LUMP 7 %d\n", lump );
 #endif
 
 			flatmemory += lumpinfo[lump].size;
@@ -795,7 +796,7 @@ void R_PrecacheLevel (void)
 			lump = texture->patches[j].patch;
 
 #ifdef GENERATE_BAKED
-				printf( "\nACCESS_LUMP 6 %d\n", lump );
+				printf_( "\nACCESS_LUMP 6 %d\n", lump );
 #endif
 
 			texturememory += lumpinfo[lump].size;
@@ -828,7 +829,7 @@ void R_PrecacheLevel (void)
 
 
 #ifdef GENERATE_BAKED
-				printf( "\nACCESS_LUMP 8 %d\n", lump );
+				printf_( "\nACCESS_LUMP 8 %d\n", lump );
 #endif
 
 				spritememory += lumpinfo[lump].size;

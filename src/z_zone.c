@@ -125,7 +125,7 @@ void Z_Free (void* ptr)
     memblock_t*		block;
     memblock_t*		other;
 #if SET_MEMORY_DEBUG
-	printf( "Free: %p\n", ptr );
+	printf_( "Free: %p\n", ptr );
 #endif
     block = (memblock_t *) ( (byte *)ptr - sizeof(memblock_t));
     if (block->id != ZONEID)
@@ -187,12 +187,12 @@ void*	Z_Malloc_Internal_Extended (int size, int tag, void *ptr, const char * fil
 	void * ret;
 	usedram += size;
 #if SET_MEMORY_DEBUG
-	printf( "MALLOC: %d %d %p @ %s:%d -> %d ->", size, tag, ptr, fil, line, usedram );
+	printf_( "MALLOC: %d %d %p @ %s:%d -> %d ->", size, tag, ptr, fil, line, usedram );
 	fflush( stdout );
 #endif
 	ret = Z_Malloc_Internal( size, tag, ptr );
 #if SET_MEMORY_DEBUG
-	printf( "%p\n", ret );
+	printf_( "%p\n", ret );
 #endif
 	return ret;
 }
@@ -347,16 +347,16 @@ Z_DumpHeap
 {
     memblock_t*	block;
 	
-    printf ("zone size: %i  location: %p\n",
+    printf_ ("zone size: %i  location: %p\n",
 	    mainzone->size,mainzone);
     
-    printf ("tag range: %i to %i\n",
+    printf_ ("tag range: %i to %i\n",
 	    lowtag, hightag);
 	
     for (block = mainzone->blocklist.next ; ; block = block->next)
     {
 	if (block->tag >= lowtag && block->tag <= hightag)
-	    printf ("block:%p    size:%7i    user:%p    tag:%3i\n",
+	    printf_ ("block:%p    size:%7i    user:%p    tag:%3i\n",
 		    block, block->size, block->user, block->tag);
 		
 	if (block->next == &mainzone->blocklist)
@@ -366,13 +366,13 @@ Z_DumpHeap
 	}
 	
 	if ( (byte *)block + block->size != (byte *)block->next)
-	    printf ("ERROR: block size does not touch the next block\n");
+	    printf_ ("ERROR: block size does not touch the next block\n");
 
 	if ( block->next->prev != block)
-	    printf ("ERROR: next block doesn't have proper back link\n");
+	    printf_ ("ERROR: next block doesn't have proper back link\n");
 
 	if (!block->user && !block->next->user)
-	    printf ("ERROR: two consecutive free blocks\n");
+	    printf_ ("ERROR: two consecutive free blocks\n");
     }
 }
 

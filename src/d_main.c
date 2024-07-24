@@ -77,6 +77,9 @@
 
 #include "d_main.h"
 
+#include <vmtimer.h>
+#include <vmsys.h>
+
 //
 // D-DoomLoop()
 // Not a globally visible function,
@@ -99,7 +102,7 @@ boolean         fastparm;	// checkparm of -fast
 
 boolean         drone;
 
-boolean		singletics = false; // debug flag to cancel adaptiveness
+boolean		singletics = true; // debug flag to cancel adaptiveness
 
 
 
@@ -346,6 +349,57 @@ void D_Display (void)
 //
 extern  boolean         demorecording;
 
+void D_DoomLoop_cb(int tid) {
+	printf_("loop begin\n");
+	// frame syncronous IO operations
+	I_StartFrame ();                
+	
+	// process one or more tics
+	if (singletics)
+	{
+		printf_("loop enter singletics\n");
+		I_StartTic ();
+		//printf_("loop entering D_ProcessEvents()\n");
+		D_ProcessEvents ();
+		//printf_("loop entering G_BuildTiccmd()\n");
+		G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
+		if (advancedemo) {
+			printf_("loop entering D_DoAdvanceDemo()\n");
+			D_DoAdvanceDemo ();
+		}
+		//printf_("loop entering M_Ticker()\n");
+		M_Ticker ();
+		//printf_("loop entering G_Ticker()\n");
+		G_Ticker ();
+		gametic++;
+		maketic++;
+	}
+	else
+	{
+		printf_("loop not enter singletics\n");
+		TryRunTics (); // will run at least one tic
+	}
+		
+	//S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
+
+	// Update display, next frame, with current state.
+	printf_("loop entering D_Display()\n");
+	D_Display ();
+
+#ifndef SNDSERV
+	// Sound mixing for the buffer is snychronous.
+	//I_UpdateSound();
+#endif	
+	// Synchronous sound output is explicitly called.
+#ifndef SNDINTR
+	// Update sound output.
+	//I_SubmitSound();
+#endif
+	printf_("loop end\n");
+}
+
+VMINT main_loop_timer = -1;
+
 void D_DoomLoop (void)
 {
     if (demorecording)
@@ -355,53 +409,20 @@ void D_DoomLoop (void)
     {
 	char    filename[20];
 	sprintf (filename,"debug%i.txt",consoleplayer);
-	printf ("debug output to: %s\n",filename);
+	printf_ ("debug output to: %s\n",filename);
 	debugfile = fopen (filename,"w");
     }
 	
     I_InitGraphics ();
 
-    while (1)
-    {
-	// frame syncronous IO operations
-	I_StartFrame ();                
-	
-	// process one or more tics
-	if (singletics)
-	{
-	    I_StartTic ();
-	    D_ProcessEvents ();
-		G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
-		if (advancedemo)
-		D_DoAdvanceDemo ();
-	    M_Ticker ();
-	    G_Ticker ();
-	    gametic++;
-	    maketic++;
+	// Main game loop
+	// We have to do this, since MRE is single-thread and a loop
+	// will block it
+    //main_loop_timer = vm_create_timer(1000/30, D_DoomLoop_cb);
+	while(true) {
+		D_DoomLoop_cb(0);
 	}
-	else
-	{
-	    TryRunTics (); // will run at least one tic
-	}
-		
-	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
-
-	// Update display, next frame, with current state.
-	D_Display ();
-
-#ifndef SNDSERV
-	// Sound mixing for the buffer is snychronous.
-	I_UpdateSound();
-#endif	
-	// Synchronous sound output is explicitly called.
-#ifndef SNDINTR
-	// Update sound output.
-	I_SubmitSound();
-#endif
-    }
 }
-
-
 
 //
 //  DEMO LOOP
@@ -624,10 +645,10 @@ void D_DoomMain (void)
 	break;
     }
     
-    printf ("%s\n",title);
+    printf_ ("%s\n",title);
 
     if (devparm)
-	printf(D_DEVSTR);
+	printf_(D_DEVSTR);
     
 
     // turbo option
@@ -643,7 +664,7 @@ void D_DoomMain (void)
 	    scale = 10;
 	if (scale > 400)
 	    scale = 400;
-	printf ("turbo scale: %i%%\n",scale);
+	printf_ ("turbo scale: %i%%\n",scale);
 	forwardmove[0] = forwardmove[0]*scale/100;
 	forwardmove[1] = forwardmove[1]*scale/100;
 	sidemove[0] = sidemove[0]*scale/100;
@@ -668,7 +689,7 @@ void D_DoomMain (void)
 	  case registered:
 	    sprintf (file,"~"DEVMAPS"E%cM%c.wad",
 		     myargv[p+1][0], myargv[p+2][0]);
-	    printf("Warping to Episode %s, Map %s.\n",
+	    printf_("Warping to Episode %s, Map %s.\n",
 		   myargv[p+1],myargv[p+2]);
 	    break;
 	    
@@ -704,7 +725,7 @@ void D_DoomMain (void)
     {
 	sprintf (file,"%s.lmp", myargv[p+1]);
 	D_AddFile (file);
-	printf("Playing demo %s.lmp.\n",myargv[p+1]);
+	printf_("Playing demo %s.lmp.\n",myargv[p+1]);
     }
 */    
     // get skill / episode / map from parms
@@ -734,15 +755,15 @@ void D_DoomMain (void)
     {
 	int     time;
 	time = atoi(myargv[p+1]);
-	printf("Levels will end after %d minute",time);
+	printf_("Levels will end after %d minute",time);
 	if (time>1)
-	    printf("s");
-	printf(".\n");
+	    printf_("s");
+	printf_(".\n");
     }
 
     p = M_CheckParm ("-avg");
     if (p && p < myargc-1 && deathmatch)
-	printf("Austin Virtual Gaming: Levels will end after 20 minutes\n");
+	printf_("Austin Virtual Gaming: Levels will end after 20 minutes\n");
 
 #if E1M1ONLY
 	p = 1;
@@ -765,16 +786,16 @@ void D_DoomMain (void)
 #endif
     
     // init subsystems
-    printf ("V_Init: allocate screens.\n");
+    printf_ ("V_Init: allocate screens.\n");
     V_Init ();
 
-    printf ("M_LoadDefaults: Load system defaults.\n");
+    printf_ ("M_LoadDefaults: Load system defaults.\n");
     M_LoadDefaults ();              // load before initing other systems
 
-    printf ("Z_Init: Init zone memory allocation daemon. \n");
+    printf_ ("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
 
-//    printf ("W_Init: Init WADfiles.\n");
+//    printf_ ("W_Init: Init WADfiles.\n");
 //    W_InitMultipleFiles (wadfiles);
 
     // Check for -file in shareware
@@ -805,7 +826,7 @@ void D_DoomMain (void)
     // Iff additonal PWAD files are used, print modified banner
     if (modifiedgame)
     {
-	/*m*/printf (
+	/*m*/printf_ (
 	    "===========================================================================\n"
 	    "ATTENTION:  This version of DOOM has been modified.  If you would like to\n"
 	    "get a copy of the original game, call 1-800-IDGAMES or see the readme file.\n"
@@ -822,7 +843,7 @@ void D_DoomMain (void)
     {
       case shareware:
       case indetermined:
-	printf (
+	printf_ (
 	    "===========================================================================\n"
 	    "                                Shareware!\n"
 	    "===========================================================================\n"
@@ -831,7 +852,7 @@ void D_DoomMain (void)
       case registered:
       case retail:
       case commercial:
-	printf (
+	printf_ (
 	    "===========================================================================\n"
 	    "                 Commercial product - do not distribute!\n"
 	    "         Please report software piracy to the SPA: 1-800-388-PIR8\n"
@@ -844,28 +865,28 @@ void D_DoomMain (void)
 	break;
     }
 
-    printf ("M_Init: Init miscellaneous info.\n");
+    printf_ ("M_Init: Init miscellaneous info.\n");
     M_Init ();
 
-    printf ("R_Init: Init DOOM refresh daemon - ");
+    printf_ ("R_Init: Init DOOM refresh daemon - \n");
     R_Init ();
 
-    printf ("\nP_Init: Init Playloop state.\n");
+    printf_ ("\nP_Init: Init Playloop state.\n");
     P_Init ();
 
-    printf ("I_Init: Setting up machine state.\n");
+    printf_ ("I_Init: Setting up machine state.\n");
     I_Init ();
 
-    printf ("D_CheckNetGame: Checking network game status.\n");
+    printf_ ("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
 
-    printf ("S_Init: Setting up sound.\n");
-    S_Init (snd_SfxVolume /* *8 */, snd_MusicVolume /* *8*/ );
+    printf_ ("S_Init: Setting up sound.\n");
+    //S_Init (snd_SfxVolume /* *8 */, snd_MusicVolume /* *8*/ );
 
-    printf ("HU_Init: Setting up heads up display.\n");
+    printf_ ("HU_Init: Setting up heads up display.\n");
     HU_Init ();
 
-    printf ("ST_Init: Init status bar.\n");
+    printf_ ("ST_Init: Init status bar.\n");
     ST_Init ();
 
     // check for a driver that wants intermission stats
@@ -876,7 +897,7 @@ void D_DoomMain (void)
 	extern  void*	statcopy;                            
 
 	statcopy = (void*)atoi(myargv[p+1]);
-	printf ("External statistics registered.\n");
+	printf_ ("External statistics registered.\n");
     }
     
     // start the apropriate game based on parms
@@ -926,7 +947,7 @@ void D_DoomMain (void)
 #ifdef GENERATE_BAKED
 	int i;
 	extern int numtextures;
-	printf( "NRT: %d\n", numtextures );
+	printf_( "NRT: %d\n", numtextures );
 	for( i = 0; i < numtextures; i++ )
 	{
 		R_GenerateComposite( i );
@@ -1131,7 +1152,7 @@ extern const texture_t**	textures;
 // Store VERTEXES, ... and hopefully some day LINEDEFS, SIDEDEFS, etc.
 //
 	{
-		printf( "Done creating baked_texture_data.c, moving onto maps.\n" );
+		printf_( "Done creating baked_texture_data.c, moving onto maps.\n" );
 
 		bf = fopen( "support/baked_map_data.c", "w" );
 		fprintf( bf, "//This file is autogenerated when compiled against GENERATE_BAKED and run.\n" );
@@ -1159,7 +1180,7 @@ extern const texture_t**	textures;
 		while( p && p < myargc-1 )
 		{
 			int ai = atoi( myargv[p+1] );
-			printf( "SKIPPING MAP %d\n", ai );
+			printf_( "SKIPPING MAP %d\n", ai );
 			if( ai == -1 ) break;
 			bakemaps[ai] = "SKIP";
 			p++;

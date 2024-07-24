@@ -343,7 +343,7 @@ void I_StartTic (void)
 		event.data1 = hit;
 		D_PostEvent(&event);
 		downmap[(uint8_t)event.data1] = 10;
-		printf( "DOWN %d\n", event.data1 );
+		printf_( "DOWN %d\n", event.data1 );
 	}
 	
 	int i;
@@ -355,7 +355,7 @@ void I_StartTic (void)
 			{
 				event.type = ev_keyup;
 				event.data1 = i;
-				printf( "UP %d\n", i );
+				printf_( "UP %d\n", i );
 				D_PostEvent(&event);
 			}
 		}
@@ -419,7 +419,7 @@ void I_FinishUpdate (void)
 	for( y = 0; y < lscreenh; y++ )
 	{
 		int ly = y * SCREENHEIGHT / lscreenh;
-		printf( "\x1b[%d;%dH", y+1, 1 );
+		printf_( "\x1b[%d;%dH", y+1, 1 );
 		for( x = 0; x < lscreenw; x++ )
 		{
 			int lx = x * SCREENWIDTH / lscreenw;
@@ -429,9 +429,9 @@ void I_FinishUpdate (void)
 			int b = lpalette[col*3+2]+32;
 			int selcolor1 = (!!(r&128)) | (!!(g&128))*2 | (!!(b&128))*4;
 			int selcolor2 = (!!(r&64)) | (!!(g&64))*2 | (!!(b&64))*4;
-			if( selcolor1 != lastcolor1 ) { printf( "\x1b[4%dm", selcolor1 ); lastcolor1 = selcolor1; }
-			if( selcolor2 != lastcolor2 ) { printf( "\x1b[3%dm", selcolor2 ); lastcolor2 = selcolor2; }
-			printf( "%c", '0' + col/4 );
+			if( selcolor1 != lastcolor1 ) { printf_( "\x1b[4%dm", selcolor1 ); lastcolor1 = selcolor1; }
+			if( selcolor2 != lastcolor2 ) { printf_( "\x1b[3%dm", selcolor2 ); lastcolor2 = selcolor2; }
+			printf_( "%c", '0' + col/4 );
 		}
 	}
 	fflush( stdout );

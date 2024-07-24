@@ -27,14 +27,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <sys/ioctl.h>
-
 #include "i_system.h"
 #include "d_event.h"
 #include "d_net.h"
@@ -43,6 +35,15 @@
 #include "doomstat.h"
 
 #ifndef DISABLE_NETWORK
+
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <sys/ioctl.h>
 
 #ifdef __GNUG__
 #pragma implementation "i_net.h"
@@ -147,7 +148,7 @@ void PacketSend (void)
 	sw.cmds[c].buttons = netbuffer->cmds[c].buttons;
     }
 		
-    //printf ("sending %i\n",gametic);		
+    //printf_ ("sending %i\n",gametic);		
     c = sendto (sendsocket , &sw, doomcom->datalength
 		,0,(void *)&sendaddress[doomcom->remotenode]
 		,sizeof(sendaddress[doomcom->remotenode]));
@@ -182,7 +183,7 @@ void PacketGet (void)
     {
 	static int first=1;
 	if (first)
-	    printf("len=%d:p=[0x%x 0x%x] \n", c, *(int*)&sw, *((int*)&sw+1));
+	    printf_("len=%d:p=[0x%x 0x%x] \n", c, *(int*)&sw, *((int*)&sw+1));
 	first = 0;
     }
 
@@ -275,7 +276,7 @@ void I_InitNetwork (void)
     if (p && p<myargc-1)
     {
 	DOOMPORT = atoi (myargv[p+1]);
-	printf ("using alternate port %i\n",DOOMPORT);
+	printf_ ("using alternate port %i\n",DOOMPORT);
     }
     
     // parse network game options,

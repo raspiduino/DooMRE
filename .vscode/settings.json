@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "vmio.h": "c",
+        "vmstdlib.h": "c",
+        "vmgraph.h": "c"
+    }
+}

@@ -24,7 +24,7 @@
 //static const char
 //rcsid[] = "$Id: s_sound.c,v 1.6 1997/02/03 22:45:12 b1 Exp $";
 
-
+/*
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -272,7 +272,7 @@ S_StartSoundAtVolume
   // Debug.
   /*fprintf( stderr,
   	   "S_StartSoundAtVolume: playing sound %d (%s)\n",
-  	   sfx_id, S_sfx[sfx_id].name );*/
+  	   sfx_id, S_sfx[sfx_id].name );
   
   // check for bogus sound #
   if (sfx_id < 1 || sfx_id > NUMSFX)
@@ -388,7 +388,7 @@ S_StartSoundAtVolume
   // Assigns the handle to one of the channels in the
   //  mix/output buffer.
   channels[cnum].handle = I_StartSound(sfx_id,
-				       /*sfx->data,*/
+				       /*sfx->data,
 				       volume,
 				       sep,
 				       pitch,
@@ -549,7 +549,7 @@ void S_UpdateSounds(void* listener_p)
 	    }
 	}
 	nextcleanup = gametic + 15;
-    }*/
+    }
     
     for (cnum=0 ; cnum<numChannels ; cnum++)
     {
@@ -878,3 +878,74 @@ S_getChannel
 
 
 #endif
+*/
+
+//
+// Initializes sound stuff, including volume
+// Sets channels, SFX and music volume,
+//  allocates channel buffer, sets S_sfx lookup.
+//
+void
+S_Init
+( int		sfxVolume,
+  int		musicVolume ) {}
+
+
+
+
+//
+// Per level startup code.
+// Kills playing sounds at start of level,
+//  determines music if any, changes music.
+//
+void S_Start(void) {}
+
+
+//
+// Start sound for thing at <origin>
+//  using <sound_id> from sounds.h
+//
+void
+S_StartSound
+( void*		origin,
+  int		sound_id ) {}
+
+
+
+// Will start a sound at a given volume.
+void
+S_StartSoundAtVolume
+( void*		origin,
+  int		sound_id,
+  int		volume ) {}
+
+
+// Stop sound for thing at <origin>
+void S_StopSound(void* origin) {}
+
+
+// Start music using <music_id> from sounds.h
+void S_StartMusic(int music_id) {}
+
+// Start music using <music_id> from sounds.h,
+//  and set whether looping
+void
+S_ChangeMusic
+( int		music_id,
+  int		looping ) {}
+
+// Stops the music fer sure.
+void S_StopMusic(void) {}
+
+// Stop and resume music, during game PAUSE.
+void S_PauseSound(void) {}
+void S_ResumeSound(void) {}
+
+
+//
+// Updates music & sounds
+//
+void S_UpdateSounds(void* listener) {}
+
+void S_SetMusicVolume(int volume) {}
+void S_SetSfxVolume(int volume) {}

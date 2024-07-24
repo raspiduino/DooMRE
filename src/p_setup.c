@@ -529,7 +529,7 @@ void P_LoadNodes (int lump)
     node_t*	no;
 	
     numnodes = W_LumpLength (lump) / sizeof(mapnode_t);
-    printf( "NUMNODES---->%d\n", numnodes );
+    printf_( "NUMNODES---->%d\n", numnodes );
     nodes = Z_Malloc (numnodes*sizeof(node_t),PU_LEVEL,0);	
     data = W_CacheLumpNum (lump,PU_STATIC);
 	
@@ -650,7 +650,7 @@ P_SetupLevel
 	{
 		// map is actually pointer.
 		strcpy( lumpname, map );
-		printf( "LOADING MAP %s\n", map );
+		printf_( "LOADING MAP %s\n", map );
 	}
 	else
 	{
@@ -744,7 +744,7 @@ P_SetupLevel
     if (precache)
 	R_PrecacheLevel ();
 
-    //printf ("free memory: 0x%x\n", Z_FreeMemory());
+    //printf_ ("free memory: 0x%x\n", Z_FreeMemory());
 
 }
 
@@ -874,7 +874,7 @@ fprintf( stderr, "LOADING FROM MAP: %s\n", lumpname );
     if (precache)
 	R_PrecacheLevel ();
 
-    //printf ("free memory: 0x%x\n", Z_FreeMemory());
+    //printf_ ("free memory: 0x%x\n", Z_FreeMemory());
 }
 
 #endif
@@ -886,8 +886,11 @@ fprintf( stderr, "LOADING FROM MAP: %s\n", lumpname );
 void P_Init (void)
 {
     P_InitSwitchList ();
+    printf_("Done P_InitSwitchList\n");
     P_InitPicAnims ();
+    printf_("Done P_InitPicAnims\n");
     R_InitSprites (sprnames);
+    printf_("Done R_InitSprites\n");
 }
 
 

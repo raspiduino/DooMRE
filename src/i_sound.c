@@ -24,7 +24,7 @@
 //static const char
 //rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -407,10 +407,10 @@ void I_SetChannels()
   int*	steptablemid = steptable + 128;
   
   // Okay, reset internal mixing channels to zero.
-  /*for (i=0; i<NUM_CHANNELS; i++)
-  {
-    channels[i] = 0;
-  }*/
+  ///*for (i=0; i<NUM_CHANNELS; i++)
+  //{
+  //  channels[i] = 0;
+  //}
 
   // This table provides step widths for pitch parameters.
   // I fail to see that this is currently used.
@@ -792,7 +792,7 @@ I_InitSound()
     myioctl(audio_fd, SNDCTL_DSP_SETFMT, &i);
   else
     fprintf(stderr, "Could not play signed 16 data\n");
-*/
+//
   fprintf(stderr, " configured audio device\n" );
 
     
@@ -912,7 +912,7 @@ int I_QrySongPlaying(int handle)
 //  time independend timer happens to get lost due to heavy load.
 // SIGALRM and ITIMER_REAL doesn't really work well.
 // There are issues with profiling as well.
-static int /*__itimer_which*/  itimer = ITIMER_REAL;
+static int /*__itimer_which  itimer = ITIMER_REAL;
 
 static int sig = SIGALRM;
 
@@ -988,3 +988,4 @@ void I_SoundDelTimer()
 }
 
 #endif
+*/

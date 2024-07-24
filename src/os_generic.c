@@ -154,11 +154,9 @@ void OGDeleteSema( og_sema_t os )
 #define _GNU_SOURCE
 
 
-#include <sys/stat.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
-#include <semaphore.h>
 
 pthread_mutex_t g_RawMutexStart = PTHREAD_MUTEX_INITIALIZER;
 
@@ -179,7 +177,7 @@ double OGGetAbsoluteTime()
 	return ((double)tv.tv_usec)/1000000. + (tv.tv_sec);
 }
 
-double OGGetFileTime( const char * file )
+/*double OGGetFileTime( const char * file )
 {
 	struct stat buff; 
 
@@ -191,17 +189,17 @@ double OGGetFileTime( const char * file )
 	}
 
 	return buff.st_mtime;
-}
+}*/
 
 
 
 og_thread_t OGCreateThread( void * (routine)( void * ), void * parameter )
 {
-	pthread_t * ret = malloc( sizeof( pthread_t ) );
+	pthread_t * ret = vm_malloc( sizeof( pthread_t ) );
 	int r = pthread_create( ret, 0, routine, parameter );
 	if( r )
 	{
-		free( ret );
+		vm_free( ret );
 		return 0;
 	}
 	return (og_thread_t)ret;
@@ -215,7 +213,7 @@ void * OGJoinThread( og_thread_t ot )
 		return 0;
 	}
 	pthread_join( *(pthread_t*)ot, &retval );
-	free( ot );
+	vm_free( ot );
 	return retval;
 }
 
@@ -226,13 +224,13 @@ void OGCancelThread( og_thread_t ot )
 		return;
 	}
 	pthread_cancel( *(pthread_t*)ot );
-	free( ot );
+	vm_free( ot );
 }
 
 og_mutex_t OGCreateMutex()
 {
 	pthread_mutexattr_t   mta;
-	og_mutex_t r = malloc( sizeof( pthread_mutex_t ) );
+	og_mutex_t r = vm_malloc( sizeof( pthread_mutex_t ) );
 
 	pthread_mutexattr_init(&mta);
 	pthread_mutexattr_settype(&mta, PTHREAD_MUTEX_RECURSIVE);
@@ -268,7 +266,7 @@ void OGDeleteMutex( og_mutex_t om )
 	}
 
 	pthread_mutex_destroy( (pthread_mutex_t*)om );
-	free( om );
+	vm_free( om );
 }
 
 
@@ -276,7 +274,7 @@ void OGDeleteMutex( og_mutex_t om )
 
 og_sema_t OGCreateSema()
 {
-	sem_t * sem = malloc( sizeof( sem_t ) );
+	sem_t * sem = vm_malloc( sizeof( sem_t ) );
 	sem_init( sem, 0, 0 );
 	return (og_sema_t)sem;
 }
@@ -302,7 +300,7 @@ void OGUnlockSema( og_sema_t os )
 void OGDeleteSema( og_sema_t os )
 {
 	sem_destroy( os );
-	free(os);
+	vm_free(os);
 }
 
 

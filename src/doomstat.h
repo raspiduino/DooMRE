@@ -106,8 +106,8 @@ extern  boolean	deathmatch;
 //  Sound FX volume has default, 0 - 15
 //  Music volume has default, 0 - 15
 // These are multiplied by 8.
-extern int snd_SfxVolume;      // maximum volume for sound
-extern int snd_MusicVolume;    // maximum volume for music
+//extern int snd_SfxVolume;      // maximum volume for sound
+//extern int snd_MusicVolume;    // maximum volume for music
 
 // Current music/sfx card - index useless
 //  w/o a reference LUT in a sound module.

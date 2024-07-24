@@ -799,13 +799,13 @@ void M_DrawReadThis2(void)
 //
 void M_DrawSound(void)
 {
-    V_DrawPatchDirect (60,38,0,W_CacheLumpName("M_SVOL",PU_CACHE));
+    /*V_DrawPatchDirect (60,38,0,W_CacheLumpName("M_SVOL",PU_CACHE));
 
     M_DrawThermo(SoundDef.x,SoundDef.y+LINEHEIGHT*(sfx_vol+1),
 		 16,snd_SfxVolume);
 
     M_DrawThermo(SoundDef.x,SoundDef.y+LINEHEIGHT*(music_vol+1),
-		 16,snd_MusicVolume);
+		 16,snd_MusicVolume);*/
 }
 
 void M_Sound(int choice)
@@ -815,7 +815,7 @@ void M_Sound(int choice)
 
 void M_SfxVol(int choice)
 {
-    switch(choice)
+    /*switch(choice)
     {
       case 0:
 	if (snd_SfxVolume)
@@ -827,12 +827,12 @@ void M_SfxVol(int choice)
 	break;
     }
 	
-    S_SetSfxVolume(snd_SfxVolume /* *8 */);
+    S_SetSfxVolume(snd_SfxVolume /* *8 );*/
 }
 
 void M_MusicVol(int choice)
 {
-    switch(choice)
+    /*switch(choice)
     {
       case 0:
 	if (snd_MusicVolume)
@@ -844,7 +844,7 @@ void M_MusicVol(int choice)
 	break;
     }
 	
-    S_SetMusicVolume(snd_MusicVolume /* *8 */);
+    S_SetMusicVolume(snd_MusicVolume /* *8 );*/
 }
 
 
@@ -1846,6 +1846,7 @@ void M_Ticker (void)
 //
 void M_Init (void)
 {
+    //mremu_print("[M_Init] Entered M_Init\n");
     currentMenu = &MainDef;
     menuactive = 0;
     itemOn = currentMenu->lastOn;
@@ -1860,7 +1861,7 @@ void M_Init (void)
     // Here we could catch other version dependencies,
     //  like HELP1/2, and four episodes.
 
-  
+    //mremu_print("[M_Init] going to switch\n");
     switch ( gamemode )
     {
       case commercial:
@@ -1889,5 +1890,6 @@ void M_Init (void)
 	break;
     }
     
+    //mremu_print("[M_Init] returning\n");
 }
 

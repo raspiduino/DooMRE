@@ -74,10 +74,10 @@ int filelength (int handle)
 
 #define strcmpi		strcasecmp
 
-void strupr (char* s)
+/*void strupr (char* s)
 {
 	while (*s) { *s = toupper(*s); s++; }
-}
+}*/
 
 
 void
@@ -208,6 +208,7 @@ int W_NumLumps (void)
 
 int W_CheckNumForName (char* name)
 {
+	//printf_("W_CheckNumForName(%s)\n", name);
 	union {
 		char	s[9];
 		int		x[2];
@@ -239,13 +240,13 @@ int W_CheckNumForName (char* name)
 			 && *(int *)&lump_p->name[4] == v2)
 		{
 #ifdef GENERATE_BAKED
-			printf( "\nACCESS_LUMP 0 %d\n", lump_p - lumpinfo );
+			printf_( "\nACCESS_LUMP 0 %d\n", lump_p - lumpinfo );
 #endif
 			return lump_p - lumpinfo;
 		}
 	}
 
-	printf( "WARNING: FILE NOT FOUND: %s\n", name );
+	printf_( "WARNING: FILE NOT FOUND: %s\n", name );
 
 	// TFB. Not found.
 	return -1;
@@ -261,11 +262,12 @@ int W_CheckNumForName (char* name)
 int W_GetNumForName (char* name)
 {
 	int		i;
+	//printf_("W_GetNumForName(%s)\n", name);
 
 	i = W_CheckNumForName (name);
 
 	if (i == -1)
-	  I_Error ("W_GetNumForName: %s not found!", name);
+	  I_Error ("W_GetNumForName: %s not found!\n", name);
   
 	return i;
 }
@@ -278,7 +280,7 @@ int W_GetNumForName (char* name)
 int W_LumpLength (int lump)
 {
 #ifdef GENERATE_BAKED
-	printf( "\nACCESS_LUMP 1 %d\n", lump );
+	printf_( "\nACCESS_LUMP 1 %d\n", lump );
 #endif
 	if (lump >= numlumps)
 		I_Error ("W_LumpLength: %i >= numlumps",lump);
@@ -300,7 +302,7 @@ void W_ReadLump( int lump, void* dest )
 	int				handle;
 
 #ifdef GENERATE_BAKED
-	printf( "\nACCESS_LUMP 2 %d\n", lump );
+	printf_( "\nACCESS_LUMP 2 %d\n", lump );
 #endif
 	if (lump >= numlumps)
 		I_Error ("W_ReadLump: %i >= numlumps",lump);
@@ -323,7 +325,7 @@ W_CacheLumpNum
 	byte*		ptr;
 
 #ifdef GENERATE_BAKED
-	printf( "\nACCESS_LUMP 3 %d\n", lump );
+	printf_( "\nACCESS_LUMP 3 %d\n", lump );
 #endif
 	if ((unsigned)lump >= numlumps)
 				I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
@@ -334,13 +336,13 @@ W_CacheLumpNum
 	{
 		// read the lump in
 		
-		//printf ("cache miss on lump %i\n",lump);
+		//printf_ ("cache miss on lump %i\n",lump);
 		ptr = Z_Malloc (W_LumpLength (lump), tag, &lumpcache[lump]);
 				W_ReadLump (lump, lumpcache[lump]);
 	}
 	else
 	{
-				//printf ("cache hit on lump %i\n",lump);
+				//printf_ ("cache hit on lump %i\n",lump);
 				Z_ChangeTag (lumpcache[lump],tag);
 	}
 		
@@ -356,7 +358,7 @@ W_CacheLumpNum_Old
 	byte*		ptr;
 
 #ifdef GENERATE_BAKED
-	printf( "\nACCESS_LUMP 4 %d\n", lump );
+	printf_( "\nACCESS_LUMP 4 %d\n", lump );
 #endif
 
 	if ((unsigned)lump >= numlumps)

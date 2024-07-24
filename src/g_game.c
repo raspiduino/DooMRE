@@ -607,6 +607,8 @@ void G_Ticker (void)
     int		i;
     int		buf; 
     ticcmd_t*	cmd;
+
+    printf_("loop entering G_Ticker()\n");
     
     // do player reborns if needed
     for (i=0 ; i<MAXPLAYERS ; i++) 

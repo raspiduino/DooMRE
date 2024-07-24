@@ -112,7 +112,7 @@ int  I_GetTime (void)
 //
 void I_Init (void)
 {
-    I_InitSound();
+    //I_InitSound();
     //  I_InitGraphics();
 }
 
@@ -121,9 +121,9 @@ void I_Init (void)
 //
 void I_Quit (void)
 {
-    D_QuitNetGame ();
-    I_ShutdownSound();
-    I_ShutdownMusic();
+    //D_QuitNetGame ();
+    //I_ShutdownSound();
+    //I_ShutdownMusic();
     M_SaveDefaults ();
     I_ShutdownGraphics();
     exit(0);
@@ -137,7 +137,7 @@ void I_WaitVBL(int count)
 #ifdef SUN
     sleep(0);
 #else
-    usleep (count * (1000000/700) );                                
+    //usleep (count * (1000000/700) );                                
 #endif
 #endif
 }
@@ -170,12 +170,10 @@ void I_Error (char *error, ...)
 
     // Message first.
     va_start (argptr,error);
-    fprintf (stderr, "Error: ");
-    vfprintf (stderr,error,argptr);
-    fprintf (stderr, "\n");
+    mremu_print("Error: ");
+    printf_(error,argptr);
+    mremu_print("\n");
     va_end (argptr);
-
-    fflush( stderr );
 
     // Shutdown. Here might be other errors.
     if (demorecording)

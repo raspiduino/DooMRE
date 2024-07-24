@@ -514,7 +514,7 @@ P_SpawnMobj
     mobj->frame = st->frame;
 
 #ifdef GENERATE_BAKED
-	printf( "ADD_SPRITE 2 %d %s\n", mobj->sprite, sprnames[mobj->sprite] );
+	printf_( "ADD_SPRITE 2 %d %s\n", mobj->sprite, sprnames[mobj->sprite] );
 #endif
 	
     // set subsector and/or block links

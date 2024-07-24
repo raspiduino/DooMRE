@@ -18,13 +18,13 @@
 #ifdef GENERATE_BAKED
 #define FIXED_HEAP 40000000 //Heap size when running on computer to store full size.
 #else
-#define FIXED_HEAP (384*1024)   //Actual heap for embedded device.
+#define FIXED_HEAP (524288)   //Actual heap for embedded device.
 #endif
 #endif
 
 
 //Always stub sound, right now the existing system takes up like 1.5MB of heap!
-#define STUB_SOUND
+//#define STUB_SOUND
 
 
 

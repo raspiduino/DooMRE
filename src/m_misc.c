@@ -204,7 +204,7 @@ extern int	screenblocks;
 extern int	showMessages;
 
 // machine-independent sound params
-extern	int	numChannels;
+//extern	int	numChannels;
 
 
 // UNIX hack, to be removed.
@@ -234,8 +234,8 @@ typedef struct
 default_t	defaults[] =
 {
     {"mouse_sensitivity",&mouseSensitivity, 5},
-    {"sfx_volume",&snd_SfxVolume, 8},
-    {"music_volume",&snd_MusicVolume, 8},
+    //{"sfx_volume",&snd_SfxVolume, 8},
+    //{"music_volume",&snd_MusicVolume, 8},
     {"show_messages",&showMessages, 1},
     
 
@@ -279,7 +279,7 @@ default_t	defaults[] =
     {"screenblocks",&screenblocks, 10},
     {"detaillevel",&detailLevel, 0},
 
-    {"snd_channels",&numChannels, 3},
+    //{"snd_channels",&numChannels, 3},
 
 
 
@@ -359,7 +359,7 @@ void M_LoadDefaults (void)
     if (i && i<myargc-1)
     {
 	defaultfile = myargv[i+1];
-	printf ("	default file: %s\n",defaultfile);
+	printf_ ("	default file: %s\n",defaultfile);
     }
     else
 	defaultfile = basedefault;
@@ -378,7 +378,7 @@ void M_LoadDefaults (void)
 		    // get a string default
 		    isstring = true;
 		    len = strlen(strparm);
-		    newstring = (char *) malloc(len);
+		    newstring = (char *) vm_malloc(len);
 		    strparm[len-1] = 0;
 		    strcpy(newstring, strparm+1);
 		}

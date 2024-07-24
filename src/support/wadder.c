@@ -48,7 +48,7 @@ int main()
 		fprintf( stderr, "Error: Bad WAD.\n" );
 	}
 	fseek( f, 0, SEEK_SET );
-	unsigned char * rawwad = malloc(len);
+	unsigned char * rawwad = vm_malloc(len);
 	fread( rawwad, 1, len, f );
 	fclose( f);
 
@@ -57,7 +57,7 @@ int main()
     numlumps = 0;
 
     // will be realloced as lumps are added
-    lumpinfo = malloc(1);	
+    lumpinfo = vm_malloc(1);	
 
     wadinfo_t		header;
     lumpinfo_t*		lump_p;
@@ -89,7 +89,7 @@ int main()
 	}
 	header.numlumps = LONG(header.numlumps);
 	header.infotableofs = LONG(header.infotableofs);
-	printf( "Table: %d %d\n", header.numlumps, header.infotableofs );
+	printf_( "Table: %d %d\n", header.numlumps, header.infotableofs );
 	length = header.numlumps*sizeof(filelump_t);
 	fileinfo = alloca (length);
 	filepos = header.infotableofs;

@@ -28,11 +28,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
 #include <errno.h>
-#include <X11/keysym.h>
-#include <netinet/in.h>
 #include <signal.h>
 #include "doomstat.h"
 #include "i_system.h"
@@ -44,23 +40,22 @@
 
 #define POINTER_WARP_COUNTDOWN	1
 
-#include "os_generic.c"
-#include "XDriver.c"
-#include "DrawFunctions.c"
+//#include "DrawFunctions.c"
 
+#include "vmio.h"
+#include "vmgraph.h"
 
-
-void HandleKey( int keycode, int bDown ){
+void HandleKey(int keycode, int bDown) {
 
     int rc;
 
-    switch(rc = keycode )
+    switch(keycode)
     {
-      case XK_Left:	rc = KEY_LEFTARROW;	break;
-      case XK_Right:	rc = KEY_RIGHTARROW;	break;
-      case XK_Down:	rc = KEY_DOWNARROW;	break;
-      case XK_Up:	rc = KEY_UPARROW;	break;
-      case XK_Escape:	rc = KEY_ESCAPE;	break;
+      case VM_KEY_UP:		rc = KEY_LEFTARROW;	break;
+      case VM_KEY_DOWN:		rc = KEY_RIGHTARROW;	break;
+      case VM_KEY_LEFT:		rc = KEY_DOWNARROW;	break;
+      case VM_KEY_RIGHT:	rc = KEY_UPARROW;	break;
+      /*case XK_Escape:	rc = KEY_ESCAPE;	break;
       case XK_Return:	rc = KEY_ENTER;		break;
       case XK_Tab:	rc = KEY_TAB;		break;
       case XK_F1:	rc = KEY_F1;		break;
@@ -109,11 +104,11 @@ void HandleKey( int keycode, int bDown ){
 	    rc = rc - XK_space + ' ';
 	if (rc >= 'A' && rc <= 'Z')
 	    rc = rc - 'A' + 'a';
-	break;
+	break;*/
     }
 
     event_t event;
-	event.type = bDown?ev_keydown:ev_keyup;
+	event.type = bDown;//?ev_keydown:ev_keyup; 0 = down, 1 = up
 	event.data1 = rc;
 	D_PostEvent(&event);
 }
@@ -199,12 +194,12 @@ void I_UpdateNoBlit (void)
 
 void I_InitGraphics(void)
 {
-	CNFGSetup( "EmbeddedDoom", SCREENWIDTH*OUTSCALE, SCREENHEIGHT*OUTSCALE );
+	//CNFGSetup( "EmbeddedDoom", SCREENWIDTH*OUTSCALE, SCREENHEIGHT*OUTSCALE );
 }
 
 void I_StartTic (void)
 {
-	CNFGHandleInput();
+	//CNFGHandleInput();
 }
 void I_ReadScreen (byte* scr)
 {
@@ -218,6 +213,10 @@ void I_ShutdownGraphics(void)
 {
 	exit(0);
 }
+
+extern VMUINT8 *layer_bufs[1];
+const int MRE_SCREEN_WIDTH = 240;
+const int MRE_SCREEN_HEIGHT = 320;
 
 void I_FinishUpdate (void)
 {
@@ -246,28 +245,23 @@ void I_FinishUpdate (void)
 	// This is for display on PC only.  Don't worry about the output staging buffer
 	// being big!
 
-	static uint32_t * bmdata;
-	if( !bmdata ) bmdata = malloc(SCREENWIDTH*SCREENHEIGHT*OUTSCALE*OUTSCALE*4);
-
 	int y, x;
 	for( y = 0; y < SCREENHEIGHT; y++ )
 	{
 		const uint8_t * screenline = &screens[0][y*SCREENWIDTH];
-		uint32_t * outline = &bmdata[y*SCREENWIDTH*OUTSCALE*OUTSCALE];
-		int xt2 = 0;
-		for( x = 0; x < SCREENWIDTH; x++, xt2+=OUTSCALE )
+		for( x = 0; x < SCREENWIDTH; x++ )
 		{
 			//lpalette
 			int col = screenline[x];
-			int lx, ly;
 			uint32_t rgb = (lpalette[col*3+0]<<16)|(lpalette[col*3+1]<<8)|(lpalette[col*3+2]<<0) | 0xff000000;
-			for( ly = 0; ly < OUTSCALE; ly++ )
-			for( lx = 0; lx < OUTSCALE; lx++ )
-				outline[xt2+SCREENWIDTH*OUTSCALE*ly+lx] = rgb;
+			uint16_t rgb565 = (((rgb >> 19) & 0x3F) << 11) | (((rgb >> 10) & 0x7C) << 5) | ((rgb & 0x1F));
+			
+			// Write to screen
+			layer_bufs[(MRE_SCREEN_WIDTH * (x + 1) - y) * 2] = rgb565;
 		}
 	}
 
-	CNFGUpdateScreenWithBitmap( bmdata,SCREENWIDTH*OUTSCALE, SCREENHEIGHT*OUTSCALE );
+	vm_graphic_flush_layer(layer_bufs, 1);
 }
 
 
